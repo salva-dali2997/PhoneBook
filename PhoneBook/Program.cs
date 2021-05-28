@@ -202,7 +202,7 @@ namespace PhoneBook
                 foreach (KeyValuePair<string, Contact> kvp in contactListDictionary)
                 {
                     contactToEditDictionary.Add(i, kvp.Value);
-                    Console.WriteLine(i.ToString(), kvp.Value.FullName);
+                    Console.WriteLine($"[{i.ToString()}] : {kvp.Value.FullName}");
                     i++;
                 }
                 string userInput = Console.ReadLine();
@@ -214,6 +214,7 @@ namespace PhoneBook
                         if (userInputAsInt <= i && userInputAsInt >= 1)
                         {
                             EditContact(contactToEditDictionary[userInputAsInt]);
+                            break;
                         }
                     }
                     catch
