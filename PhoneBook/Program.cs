@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using Newtonsoft.Json;
 
 using PhoneBook.Classes;
@@ -12,83 +11,117 @@ namespace PhoneBook
     {
         static void Main(string[] args)
         {
-            //contactsJSON stores the path of the .json file where
-            //the contacts will be stored.
-            string contactsJSON = @"C:\Users\Student\git\git_testproject\" +
-                                  @"PhoneBook\PhoneBook\Contacts.json";
 
-            //try to populate a dictionary with the current
-            //state of the json file
-            //catch will create a new dictionary to store
-            //contacts and will create the file if need be
+            //Create a Dictionary that will store your contacts
             Dictionary<string, Contact> contactListDictionary =
                 new Dictionary<string, Contact>();
-            try
+
+
+            //File path for json file
+            string contactsJSON = @"C:\Users\Student\git\PhoneBook\PhoneBook\Contacts.json";
+
+            //If the file doesn't exist, create the file
+            if (!File.Exists(contactsJSON))
             {
-                if(contactListDictionary.Count != 0)
-                {
-                    contactListDictionary = PopulateContactsDictionary(contactsJSON);
-                }
+                var myContactFile = File.Create(contactsJSON);
+                myContactFile.Close();
             }
-            catch 
+            //If it does exist
+            else
             {
-                if (!File.Exists(contactsJSON))
-                {
-                    File.Create(contactsJSON);
-                }
+                //populate a dictionary with the current
+                //state of the json file
+                contactListDictionary = PopulateContactsDictionary(contactsJSON);
             }
 
 
             //Call the main menu method which prints a number selection
             //menu to choose between a few options.
-            //1. Create a Contacyt
+            //1. Create a Contact
             //2. Edit a contact
             //3. Display a contact
             //q. Quit
             int userSelection = MainMenu();
             while (true)
             {
+                //User selected "Create a Contact"
                 if (userSelection == 1)
                 {
                     //ask the user for contact information
                     Contact contact = Program.PromptForContact();
 
+                    //add the contact to the current contact list dictionary
                     contactListDictionary.Add(contact.ContactId, contact);
 
+                    //print success message, and then clear the console
+                    Console.WriteLine("Contact successfully added, press any button to continue:");
+                    Console.ReadLine();
+                    Console.Clear();
 
                 }
-                else if(userSelection == 2)
+                //User selected "Edit a Contact"
+                else if (userSelection == 2)
                 {
+                    //Enter the contact list method
+                    PromptForContactEdit(contactListDictionary);
 
+                    //Clear the console
+                    Console.Clear();
                 }
-                else if(userSelection == 3)
+                //User selected "Display a Contact"
+                else if (userSelection == 3)
                 {
+                    //print the contacts to the console
+                    //from the contact list dictionary
                     PrintContactsToConsole(contactListDictionary);
+
+                    //hold screen to see contacts, press button to continue
+                    Console.WriteLine("Press any button to continue:");
+                    Console.ReadLine();
+
+                    //Clear the console
+                    Console.Clear();
                 }
                 else if(userSelection == 0)
                 {
                     //write it to json file
-                    //string jsonString = JsonSerializer.Serialize
-                    //    <Dictionary<string, Contact>>(contactListDictionary);
-                    string jsonString = JsonConvert.
-                        SerializeObject(contactListDictionary, Formatting.Indented);
-
-                    File.WriteAllText(contactsJSON, jsonString);
+                    File.WriteAllText(contactsJSON, JsonConvert.SerializeObject
+                        (contactListDictionary, Formatting.Indented));
+                    
                     Console.WriteLine("Thanks! Have a Day.");
-                    return;
+                    break;
                 }
                 userSelection = MainMenu();
             }
 
-            /*
-            foreach (KeyValuePair<string, Contact> entry in contacts)
-            {
-                Cntact currentContact = entry.Value;
-                Console.WriteLine($"{entry.Value.FullName}");
-            }
-            */
         }
 
+
+        /// <summary>
+        /// Populate the json contacts file into a Dictionary 
+        /// containing a string of unique Id Number
+        /// and a Contact object
+        /// </summary>
+        /// <param name="contactsJSON"></param>
+        /// <returns>a dictionary of string and contact</returns>
+        public static Dictionary<string, Contact> PopulateContactsDictionary(string contactsJSON)
+        {
+            //populate dictionary using streamreader and serializer
+            using (StreamReader file = new StreamReader(contactsJSON))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                Dictionary<string, Contact> contactsDictionary = (Dictionary<string, Contact>)serializer.Deserialize(file, typeof(Dictionary<string, Contact>));
+
+                //If the dictionary is null return a new initialized Dictionary
+                if(contactsDictionary == null)
+                {
+                    return new Dictionary<string, Contact>();
+                }
+
+                //otherwise return the populated dictionary
+                return contactsDictionary;
+            }
+        }
 
         /// <summary>
         /// Call the main menu method which prints a number selection 
@@ -99,10 +132,10 @@ namespace PhoneBook
         {
             //print main menu
             Console.WriteLine("Main Menu: ");
-            Console.WriteLine("1. Create a Contact");
-            Console.WriteLine("2. Edit a Contact");
-            Console.WriteLine("3. Display a Contact");
-            Console.WriteLine("q: to quit");
+            Console.WriteLine("[1] Create a Contact");
+            Console.WriteLine("[2] Edit a Contact");
+            Console.WriteLine("[3] Display a Contact");
+            Console.WriteLine("[q] to quit");
             Console.Write("Select a number to continue:");
 
             //ensure user input is valid. which at this point is
@@ -153,14 +186,77 @@ namespace PhoneBook
         }
 
         /// <summary>
+        /// If the user selects 2 in the main menu,
+        /// they are prompted to choose a contact to edit.
+        /// </summary>
+        /// <returns></returns>
+        public static void PromptForContactEdit(Dictionary<string, Contact> contactListDictionary)
+        {
+            while (true)
+            {
+                Console.WriteLine("Which contact would you like to edit?\n" +
+                "Search by number selection: ");
+                Dictionary<int, Contact> contactToEditDictionary =
+                    new Dictionary<int, Contact>();
+                int i = 1;
+                foreach (KeyValuePair<string, Contact> kvp in contactListDictionary)
+                {
+                    contactToEditDictionary.Add(i, kvp.Value);
+                    Console.WriteLine(i.ToString(), kvp.Value.FullName);
+                    i++;
+                }
+                string userInput = Console.ReadLine();
+                while (true)
+                {
+                    try
+                    {
+                        int userInputAsInt = int.Parse(userInput);
+                        if (userInputAsInt <= i && userInputAsInt >= 1)
+                        {
+                            EditContact(contactToEditDictionary[userInputAsInt]);
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Please enter a valid input");
+                    }
+                    break;
+                }
+
+                break;
+            }
+        }
+
+
+
+        /// <summary>
         /// If the user selects a 2 in the main menu,
         /// they are prompted to find the contact they
         /// wish to edit, and then asked which property
         /// in the given Contact object that they want to edit.
         /// </summary>
-        public static void EditContact()
+        public static void EditContact(Contact contactToEdit)
         {
-
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Which value would you like to edit?:");
+                Console.WriteLine($"[1]: {contactToEdit.FirstName}");
+                Console.WriteLine($"[2]: {contactToEdit.LastName}");
+                Console.WriteLine($"[3]: {contactToEdit.PhoneNumber}");
+                Console.WriteLine($"[4]: {contactToEdit.Email}");
+                Console.WriteLine($"[5]: {contactToEdit.DateOfBirth}");
+                string userInput = Console.ReadLine();
+                try
+                {
+                    int userInputAsInt = int.Parse(userInput);
+                    break;
+                }
+                catch
+                {
+                    Console.WriteLine("Please enter a valid input");
+                }
+            }
         }
 
         /// <summary>
@@ -169,33 +265,15 @@ namespace PhoneBook
         /// to the console in a readable format
         /// </summary>
         /// <param name="contactsJSON"></param>
-        public static void PrintContactsToConsole(Dictionary<string, Contact> contactDictionary)
+        public static void PrintContactsToConsole(Dictionary<string, Contact> contactListDictionary)
         {
-            foreach (KeyValuePair<string, Contact> kvp in contactDictionary)
+            foreach (KeyValuePair<string, Contact> kvp in contactListDictionary)
             {
                 Console.WriteLine($"Name: {kvp.Value.FullName}");
                 Console.WriteLine($"Phone Number: {kvp.Value.PhoneNumber}");
                 Console.WriteLine($"Email: {kvp.Value.Email}");
                 Console.WriteLine($"DOB: {kvp.Value.DateOfBirth}");
                 Console.WriteLine($"Address: {kvp.Value.Address.AddressToString()}");
-            }
-        }
-
-        /// <summary>
-        /// Populate the json contacts file into a Dictionary 
-        /// containing a string of unique Id Number
-        /// and a Contact object
-        /// </summary>
-        /// <param name="contactsJSON"></param>
-        /// <returns>a dictionary of string and contact</returns>
-        public static Dictionary<string, Contact> PopulateContactsDictionary(string contactsJSON)
-        {
-            using(StreamReader r = new StreamReader(contactsJSON))
-            {
-                string json = r.ReadToEnd();
-                Dictionary<string, Contact> contactsDictionary =
-                    JsonConvert.DeserializeObject<Dictionary<string, Contact>>(json);
-                return contactsDictionary;
             }
         }
 

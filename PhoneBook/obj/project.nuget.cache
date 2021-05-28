@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "471yCRnMFnpo+Ui8CW0jedM+VGaNirgBNZJa8HVhXWu7X6ef/asuydSa3JXbQ8V7UpTVD0758TJo8MTnXn5Lcg==",
+  "dgSpecHash": "b/1EmGGhmZpCTOyngT7LQwi7NvAWnZ4xTo9YYPEAvVwBmOq10Ollu56bvZQRjFB12SiqYA9f9ouCFwfN27QBbA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Student\\git\\git_testproject\\PhoneBook\\PhoneBook\\PhoneBook.csproj",
+  "projectFilePath": "C:\\Users\\Student\\git\\PhoneBook\\PhoneBook\\PhoneBook.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Student\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
   ],

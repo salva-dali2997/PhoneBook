@@ -6,7 +6,7 @@ namespace PhoneBook.Classes
 {
     class Contact
     {
-        public string ContactId { get; private set; } = Guid.NewGuid().ToString();
+        public string ContactId { get; } = Guid.NewGuid().ToString();
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
