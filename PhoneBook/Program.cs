@@ -134,7 +134,7 @@ namespace PhoneBook
             Console.WriteLine("Main Menu: ");
             Console.WriteLine("[1] Create a Contact");
             Console.WriteLine("[2] Edit a Contact");
-            Console.WriteLine("[3] Display a Contact");
+            Console.WriteLine("[3] Display Contacts");
             Console.WriteLine("[q] to quit");
             Console.Write("Select a number to continue:");
 
@@ -268,6 +268,7 @@ namespace PhoneBook
         /// <param name="contactsJSON"></param>
         public static void PrintContactsToConsole(Dictionary<string, Contact> contactListDictionary)
         {
+            Console.Clear();
             foreach (KeyValuePair<string, Contact> kvp in contactListDictionary)
             {
                 Console.WriteLine($"Name: {kvp.Value.FullName}");
@@ -275,6 +276,7 @@ namespace PhoneBook
                 Console.WriteLine($"Email: {kvp.Value.Email}");
                 Console.WriteLine($"DOB: {kvp.Value.DateOfBirth}");
                 Console.WriteLine($"Address: {kvp.Value.Address.AddressToString()}");
+                Console.WriteLine();
             }
         }
 
