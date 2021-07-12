@@ -1,2 +1,0 @@
-First Name, Last Name, Phone Number, Email, DOB, Address Number, Street Name, City, State, Zip-Code
-
